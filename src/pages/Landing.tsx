@@ -10,9 +10,10 @@ const Landing = () => {
 
   const handleUnwrap = () => {
     setIsTransitioning(true);
+    // allow the heart-expand animation to run, then navigate
     setTimeout(() => {
       navigate("/valentine");
-    }, 800);
+    }, 900);
   };
 
   return (
@@ -49,6 +50,18 @@ const Landing = () => {
 
       {/* Decorative elements */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background/50 to-transparent pointer-events-none" />
+
+      {/* Heart expand overlay to spice up the transition */}
+      {isTransitioning && (
+        <>
+          <div className="overlay-fade" />
+          <div className="overlay-heart" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+              <path d="M12 21s-7-4.97-9.33-7.3C-0.1 11.37 2.15 6 6.5 6c2.36 0 3.88 1.5 4.5 2.2C11.62 7.5 13.14 6 15.5 6 19.85 6 22.1 11.37 21.33 13.7 19 16.03 12 21 12 21z" fill="#ff6b6b" />
+            </svg>
+          </div>
+        </>
+      )}
     </div>
   );
 };

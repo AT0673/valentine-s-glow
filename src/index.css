@@ -360,3 +360,55 @@
   animation: shooting-star 8s ease-in-out infinite;
   animation-delay: 5s;
 }
+
+/* Heart expansion overlay used for page transition */
+@keyframes heart-expand {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    filter: blur(0px);
+  }
+  60% {
+    transform: scale(18);
+    opacity: 1;
+    filter: blur(2px);
+  }
+  100% {
+    transform: scale(20);
+    opacity: 1;
+    filter: blur(6px);
+  }
+}
+
+.overlay-heart {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.overlay-heart svg {
+  width: 120px;
+  height: 120px;
+  transform-origin: center;
+  animation: heart-expand 0.9s cubic-bezier(.2,.9,.2,1) forwards;
+  filter: drop-shadow(0 8px 30px rgba(255,107,107,0.35));
+}
+
+.overlay-fade {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.0) 0%, rgba(255,255,255,0.6) 60%, rgba(255,255,255,1) 100%);
+  z-index: 55;
+  pointer-events: none;
+  animation: fadeToWhite 0.9s ease-out forwards;
+}
+
+@keyframes fadeToWhite {
+  0% { opacity: 0; }
+  70% { opacity: 0.75; }
+  100% { opacity: 1; }
+}
