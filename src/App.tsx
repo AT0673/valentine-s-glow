@@ -10,6 +10,8 @@ import LoveLetter from "./pages/LoveLetter";
 import Dreams from "./pages/Dreams";
 import Quiz from "./pages/Quiz";
 import Wishes from "./pages/Wishes";
+import Countdown from "./pages/Countdown";
+import Timeline from "./pages/Timeline";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +25,8 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/valentine" element={<Valentine />} />
+          <Route path="/countdown" element={<Countdown />} />
+          <Route path="/timeline" element={<Timeline />} />
           <Route path="/love-letter" element={<LoveLetter />} />
           <Route path="/dreams" element={<Dreams />} />
           <Route path="/quiz" element={<Quiz />} />

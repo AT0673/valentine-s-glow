@@ -21,6 +21,11 @@ import {
   Sparkles,
   HelpCircle,
   Star,
+  Calendar,
+  Clock,
+  Gift,
+  Cake,
+  PartyPopper,
 } from "lucide-react";
 
 interface Photo {
@@ -54,6 +59,26 @@ interface QuizQuestion {
 interface StarWish {
   id: string;
   wish: string;
+}
+
+interface SpecialDate {
+  id: string;
+  title: string;
+  event_date: string;
+  description: string | null;
+  icon: string | null;
+  is_recurring: boolean | null;
+  display_order: number | null;
+}
+
+interface Memory {
+  id: string;
+  memory_date: string;
+  title: string;
+  description: string | null;
+  photo_url: string | null;
+  category: string | null;
+  display_order: number | null;
 }
 
 // Helper function to convert Spotify URL to embed URL
@@ -110,6 +135,22 @@ const Admin = () => {
 
   // Wishes state
   const [wishes, setWishes] = useState<StarWish[]>([]);
+
+  // Special dates state
+  const [specialDates, setSpecialDates] = useState<SpecialDate[]>([]);
+  const [newDateTitle, setNewDateTitle] = useState("");
+  const [newEventDate, setNewEventDate] = useState("");
+  const [newDateDescription, setNewDateDescription] = useState("");
+  const [newDateIcon, setNewDateIcon] = useState("heart");
+  const [newDateRecurring, setNewDateRecurring] = useState(true);
+
+  // Memories state
+  const [memories, setMemories] = useState<Memory[]>([]);
+  const [newMemoryDate, setNewMemoryDate] = useState("");
+  const [newMemoryTitle, setNewMemoryTitle] = useState("");
+  const [newMemoryDescription, setNewMemoryDescription] = useState("");
+  const [newMemoryPhotoUrl, setNewMemoryPhotoUrl] = useState("");
+  const [newMemoryCategory, setNewMemoryCategory] = useState("milestone");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -193,6 +234,20 @@ const Admin = () => {
       .select("*")
       .order("created_at", { ascending: false });
     if (wishesData) setWishes(wishesData);
+
+    // Fetch special dates
+    const { data: specialDatesData } = await supabase
+      .from("special_dates")
+      .select("*")
+      .order("display_order");
+    if (specialDatesData) setSpecialDates(specialDatesData);
+
+    // Fetch memories
+    const { data: memoriesData } = await supabase
+      .from("memories")
+      .select("*")
+      .order("memory_date", { ascending: false });
+    if (memoriesData) setMemories(memoriesData);
   };
 
   // Photo functions
@@ -334,6 +389,62 @@ const Admin = () => {
     toast({ title: "Wish deleted" });
   };
 
+  // Special dates functions
+  const addSpecialDate = async () => {
+    if (!newDateTitle.trim() || !newEventDate) return;
+
+    await supabase.from("special_dates").insert({
+      title: newDateTitle.trim(),
+      event_date: newEventDate,
+      description: newDateDescription.trim() || null,
+      icon: newDateIcon,
+      is_recurring: newDateRecurring,
+      display_order: specialDates.length,
+    });
+
+    setNewDateTitle("");
+    setNewEventDate("");
+    setNewDateDescription("");
+    setNewDateIcon("heart");
+    setNewDateRecurring(true);
+    fetchData();
+    toast({ title: "Special date added!" });
+  };
+
+  const deleteSpecialDate = async (id: string) => {
+    await supabase.from("special_dates").delete().eq("id", id);
+    fetchData();
+    toast({ title: "Special date deleted" });
+  };
+
+  // Memories functions
+  const addMemory = async () => {
+    if (!newMemoryTitle.trim() || !newMemoryDate) return;
+
+    await supabase.from("memories").insert({
+      title: newMemoryTitle.trim(),
+      memory_date: newMemoryDate,
+      description: newMemoryDescription.trim() || null,
+      photo_url: newMemoryPhotoUrl.trim() || null,
+      category: newMemoryCategory,
+      display_order: memories.length,
+    });
+
+    setNewMemoryTitle("");
+    setNewMemoryDate("");
+    setNewMemoryDescription("");
+    setNewMemoryPhotoUrl("");
+    setNewMemoryCategory("milestone");
+    fetchData();
+    toast({ title: "Memory added!" });
+  };
+
+  const deleteMemory = async (id: string) => {
+    await supabase.from("memories").delete().eq("id", id);
+    fetchData();
+    toast({ title: "Memory deleted" });
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-soft flex items-center justify-center p-4">
@@ -383,7 +494,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="photos" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 h-auto">
+          <TabsList className="grid w-full grid-cols-9 h-auto">
             <TabsTrigger value="photos" className="flex flex-col items-center gap-1 py-2">
               <Image className="w-4 h-4" />
               <span className="text-xs">Photos</span>
@@ -391,6 +502,14 @@ const Admin = () => {
             <TabsTrigger value="reasons" className="flex flex-col items-center gap-1 py-2">
               <Heart className="w-4 h-4" />
               <span className="text-xs">Reasons</span>
+            </TabsTrigger>
+            <TabsTrigger value="dates" className="flex flex-col items-center gap-1 py-2">
+              <Calendar className="w-4 h-4" />
+              <span className="text-xs">Dates</span>
+            </TabsTrigger>
+            <TabsTrigger value="memories" className="flex flex-col items-center gap-1 py-2">
+              <Clock className="w-4 h-4" />
+              <span className="text-xs">Memories</span>
             </TabsTrigger>
             <TabsTrigger value="music" className="flex flex-col items-center gap-1 py-2">
               <Music className="w-4 h-4" />
@@ -522,6 +641,196 @@ const Admin = () => {
                   {reasons.length === 0 && (
                     <p className="text-center text-muted-foreground py-8">
                       No reasons added yet
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Special Dates Tab */}
+          <TabsContent value="dates">
+            <Card>
+              <CardHeader>
+                <CardTitle>Special Dates & Anniversaries</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3 p-4 bg-secondary/50 rounded-lg">
+                  <h3 className="font-medium">Add New Special Date</h3>
+                  <Input
+                    placeholder="Title (e.g., Our Anniversary)"
+                    value={newDateTitle}
+                    onChange={(e) => setNewDateTitle(e.target.value)}
+                  />
+                  <Input
+                    type="date"
+                    value={newEventDate}
+                    onChange={(e) => setNewEventDate(e.target.value)}
+                  />
+                  <Textarea
+                    placeholder="Description (optional)"
+                    value={newDateDescription}
+                    onChange={(e) => setNewDateDescription(e.target.value)}
+                    rows={2}
+                  />
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <label className="text-sm text-muted-foreground mb-1 block">Icon</label>
+                      <select
+                        value={newDateIcon}
+                        onChange={(e) => setNewDateIcon(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md border bg-background"
+                      >
+                        <option value="heart">❤️ Heart</option>
+                        <option value="calendar">📅 Calendar</option>
+                        <option value="gift">🎁 Gift</option>
+                        <option value="cake">🎂 Cake</option>
+                        <option value="sparkles">✨ Sparkles</option>
+                        <option value="party">🎉 Party</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        id="recurring"
+                        checked={newDateRecurring}
+                        onChange={(e) => setNewDateRecurring(e.target.checked)}
+                        className="w-4 h-4"
+                      />
+                      <label htmlFor="recurring" className="text-sm">Yearly recurring</label>
+                    </div>
+                  </div>
+                  <Button onClick={addSpecialDate} className="w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Special Date
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {specialDates.map((date) => (
+                    <div
+                      key={date.id}
+                      className="flex items-center gap-3 p-3 bg-card border rounded-lg"
+                    >
+                      <Calendar className="w-5 h-5 text-primary" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">{date.title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(date.event_date).toLocaleDateString()}
+                          {date.is_recurring && " • Yearly"}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteSpecialDate(date.id)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                  {specialDates.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">
+                      No special dates added yet
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Memories Tab */}
+          <TabsContent value="memories">
+            <Card>
+              <CardHeader>
+                <CardTitle>Memory Timeline</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3 p-4 bg-secondary/50 rounded-lg">
+                  <h3 className="font-medium">Add New Memory</h3>
+                  <Input
+                    placeholder="Title (e.g., Our First Date)"
+                    value={newMemoryTitle}
+                    onChange={(e) => setNewMemoryTitle(e.target.value)}
+                  />
+                  <Input
+                    type="date"
+                    value={newMemoryDate}
+                    onChange={(e) => setNewMemoryDate(e.target.value)}
+                  />
+                  <Textarea
+                    placeholder="Description (optional)"
+                    value={newMemoryDescription}
+                    onChange={(e) => setNewMemoryDescription(e.target.value)}
+                    rows={3}
+                  />
+                  <Input
+                    placeholder="Photo URL (optional)"
+                    value={newMemoryPhotoUrl}
+                    onChange={(e) => setNewMemoryPhotoUrl(e.target.value)}
+                  />
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-1 block">Category</label>
+                    <select
+                      value={newMemoryCategory}
+                      onChange={(e) => setNewMemoryCategory(e.target.value)}
+                      className="w-full px-3 py-2 rounded-md border bg-background"
+                    >
+                      <option value="milestone">⭐ Milestone</option>
+                      <option value="date">❤️ Date</option>
+                      <option value="travel">✈️ Travel</option>
+                      <option value="photo">📷 Photo Moment</option>
+                      <option value="music">🎵 Music</option>
+                      <option value="gift">🎁 Gift</option>
+                      <option value="special">✨ Special</option>
+                      <option value="location">📍 Location</option>
+                    </select>
+                  </div>
+                  <Button onClick={addMemory} className="w-full">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Memory
+                  </Button>
+                </div>
+
+                <div className="space-y-3">
+                  {memories.map((memory) => (
+                    <div
+                      key={memory.id}
+                      className="flex items-start gap-3 p-3 bg-card border rounded-lg"
+                    >
+                      {memory.photo_url && (
+                        <img
+                          src={memory.photo_url}
+                          alt={memory.title}
+                          className="w-16 h-16 object-cover rounded"
+                        />
+                      )}
+                      {!memory.photo_url && (
+                        <Clock className="w-5 h-5 text-primary mt-1" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">{memory.title}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(memory.memory_date).toLocaleDateString()} • {memory.category}
+                        </p>
+                        {memory.description && (
+                          <p className="text-sm text-muted-foreground truncate mt-1">
+                            {memory.description}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteMemory(memory.id)}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  ))}
+                  {memories.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">
+                      No memories added yet
                     </p>
                   )}
                 </div>
