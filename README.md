@@ -1,4 +1,4 @@
-# Valentine’s Glow 🌹✨
+# Valentine's Glow 🌹✨
 
 A small Valentine-themed frontend project built with modern web tooling, focused on clean visuals and a smooth user experience.
 
@@ -15,11 +15,11 @@ A small Valentine-themed frontend project built with modern web tooling, focused
 
 ## 🛠 Tech Stack
 
-- React
-- TypeScript
-- Vite
-- Tailwind CSS
-- shadcn/ui
+- **React** - UI library
+- **TypeScript** - Type-safe JavaScript
+- **Vite** - Next-generation build tool
+- **Tailwind CSS** - Utility-first CSS framework
+- **shadcn/ui** - Beautifully designed components
 
 ---
 
@@ -30,19 +30,27 @@ A small Valentine-themed frontend project built with modern web tooling, focused
 ```bash
 git clone https://github.com/AT0673/valentine-s-glow.git
 cd valentine-s-glow
+```
 
-Install dependencies
+### Install dependencies
 
+```bash
 npm install
+```
 
-Run the development server
+### Run the development server
 
+```bash
 npm run dev
+```
 
-The development server runs at http://localhost:5173
-by default.
-📁 Project Structure
+The development server runs at `http://localhost:5173` by default.
 
+---
+
+## 📁 Project Structure
+
+```
 .
 ├── public/            # Static assets
 ├── src/               # Application source code
@@ -52,16 +60,26 @@ by default.
 ├── tailwind.config.ts # Tailwind configuration
 ├── tsconfig.json      # TypeScript configuration
 └── package.json       # Dependencies and scripts
+```
 
-📜 Scripts
-Command	Description
-npm run dev	Start development server
-npm run build	Build for production
-npm run preview	Preview production build
-🤝 Contributing
+---
 
-Pull requests are welcome.
-Feel free to open an issue to discuss changes or ideas.
-📝 License
+## 📜 Scripts
+
+| Command            | Description                |
+| ------------------ | -------------------------- |
+| `npm run dev`      | Start development server   |
+| `npm run build`    | Build for production       |
+| `npm run preview`  | Preview production build   |
+
+---
+
+## 🤝 Contributing
+
+Pull requests are welcome. Feel free to open an issue to discuss changes or ideas.
+
+---
+
+## 📝 License
 
 No license has been specified yet.
