@@ -8,43 +8,27 @@ import { PhotoGallery } from "@/components/PhotoGallery";
 import { ReasonsSection } from "@/components/ReasonsSection";
 import { MusicPlayer } from "@/components/MusicPlayer";
 import { Button } from "@/components/ui/button";
-
 const Valentine = () => {
   const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
     setIsVisible(true);
   }, []);
-
-  return (
-    <div className="min-h-screen bg-gradient-soft relative">
+  return <div className="min-h-screen bg-gradient-soft relative">
       <FloatingHearts />
       <MusicPlayer />
 
       {/* Admin Link - subtle */}
       <Link to="/admin" className="fixed top-4 right-4 z-50">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="opacity-20 hover:opacity-100 transition-opacity"
-        >
+        <Button variant="ghost" size="icon" className="opacity-20 hover:opacity-100 transition-opacity">
           <Settings className="w-5 h-5" />
         </Button>
       </Link>
 
       {/* Hero Section */}
       <section className="min-h-screen flex flex-col items-center justify-center px-4 relative">
-        <div
-          className={`text-center transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-          }`}
-        >
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-romantic mb-6 leading-tight">
-            To My Dearest Love
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-8">
-            Every moment with you is a gift I treasure forever
-          </p>
+        <div className={`text-center transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-romantic mb-6 leading-tight">To Judy</h1>
+          <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-8">I put a lot of effort into this in case you couldn't tell, this is my showing of love. <3</p>
         </div>
 
         <SpinningHeart />
@@ -73,8 +57,6 @@ const Valentine = () => {
         </p>
         <p className="text-muted-foreground">With all my love ❤️</p>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Valentine;
