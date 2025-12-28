@@ -26,6 +26,9 @@ import {
   Gift,
   Cake,
   PartyPopper,
+  Pencil,
+  X,
+  Check,
 } from "lucide-react";
 
 interface Photo {
@@ -152,6 +155,15 @@ const Admin = () => {
   const [newMemoryPhotoUrl, setNewMemoryPhotoUrl] = useState("");
   const [newMemoryCategory, setNewMemoryCategory] = useState("milestone");
 
+  // Edit states
+  const [editingPhoto, setEditingPhoto] = useState<Photo | null>(null);
+  const [editingReason, setEditingReason] = useState<Reason | null>(null);
+  const [editingDate, setEditingDate] = useState<SpecialDate | null>(null);
+  const [editingMemory, setEditingMemory] = useState<Memory | null>(null);
+  const [editingBucket, setEditingBucket] = useState<BucketListItem | null>(null);
+  const [editingQuiz, setEditingQuiz] = useState<QuizQuestion | null>(null);
+  const [editingWish, setEditingWish] = useState<StarWish | null>(null);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchData();
@@ -274,6 +286,17 @@ const Admin = () => {
     toast({ title: "Photo deleted" });
   };
 
+  const updatePhoto = async () => {
+    if (!editingPhoto) return;
+    await supabase.from("photos").update({
+      url: editingPhoto.url,
+      caption: editingPhoto.caption,
+    }).eq("id", editingPhoto.id);
+    setEditingPhoto(null);
+    fetchData();
+    toast({ title: "Photo updated!" });
+  };
+
   // Reason functions
   const addReason = async () => {
     if (!newReason.trim()) return;
@@ -294,6 +317,16 @@ const Admin = () => {
     await supabase.from("reasons").delete().eq("id", id);
     fetchData();
     toast({ title: "Reason deleted" });
+  };
+
+  const updateReason = async () => {
+    if (!editingReason) return;
+    await supabase.from("reasons").update({
+      content: editingReason.content,
+    }).eq("id", editingReason.id);
+    setEditingReason(null);
+    fetchData();
+    toast({ title: "Reason updated!" });
   };
 
   // Music function
@@ -352,6 +385,25 @@ const Admin = () => {
     toast({ title: "Dream deleted" });
   };
 
+  const updateBucketItem = async () => {
+    if (!editingBucket) return;
+    await supabase.from("bucket_list_items").update({
+      content: editingBucket.content,
+      is_completed: editingBucket.is_completed,
+    }).eq("id", editingBucket.id);
+    setEditingBucket(null);
+    fetchData();
+    toast({ title: "Dream updated!" });
+  };
+
+  const toggleBucketComplete = async (item: BucketListItem) => {
+    await supabase.from("bucket_list_items").update({
+      is_completed: !item.is_completed,
+    }).eq("id", item.id);
+    fetchData();
+    toast({ title: item.is_completed ? "Marked incomplete" : "Marked complete!" });
+  };
+
   // Quiz functions
   const addQuizQuestion = async () => {
     if (!newQuestion.trim() || !newCorrectAnswer.trim()) return;
@@ -382,11 +434,33 @@ const Admin = () => {
     toast({ title: "Question deleted" });
   };
 
+  const updateQuizQuestion = async () => {
+    if (!editingQuiz) return;
+    await supabase.from("quiz_questions").update({
+      question: editingQuiz.question,
+      correct_answer: editingQuiz.correct_answer,
+      wrong_answers: editingQuiz.wrong_answers,
+    }).eq("id", editingQuiz.id);
+    setEditingQuiz(null);
+    fetchData();
+    toast({ title: "Question updated!" });
+  };
+
   // Wishes function
   const deleteWish = async (id: string) => {
     await supabase.from("star_wishes").delete().eq("id", id);
     fetchData();
     toast({ title: "Wish deleted" });
+  };
+
+  const updateWish = async () => {
+    if (!editingWish) return;
+    await supabase.from("star_wishes").update({
+      wish: editingWish.wish,
+    }).eq("id", editingWish.id);
+    setEditingWish(null);
+    fetchData();
+    toast({ title: "Wish updated!" });
   };
 
   // Special dates functions
@@ -417,6 +491,20 @@ const Admin = () => {
     toast({ title: "Special date deleted" });
   };
 
+  const updateSpecialDate = async () => {
+    if (!editingDate) return;
+    await supabase.from("special_dates").update({
+      title: editingDate.title,
+      event_date: editingDate.event_date,
+      description: editingDate.description,
+      icon: editingDate.icon,
+      is_recurring: editingDate.is_recurring,
+    }).eq("id", editingDate.id);
+    setEditingDate(null);
+    fetchData();
+    toast({ title: "Special date updated!" });
+  };
+
   // Memories functions
   const addMemory = async () => {
     if (!newMemoryTitle.trim() || !newMemoryDate) return;
@@ -443,6 +531,20 @@ const Admin = () => {
     await supabase.from("memories").delete().eq("id", id);
     fetchData();
     toast({ title: "Memory deleted" });
+  };
+
+  const updateMemory = async () => {
+    if (!editingMemory) return;
+    await supabase.from("memories").update({
+      title: editingMemory.title,
+      memory_date: editingMemory.memory_date,
+      description: editingMemory.description,
+      photo_url: editingMemory.photo_url,
+      category: editingMemory.category,
+    }).eq("id", editingMemory.id);
+    setEditingMemory(null);
+    fetchData();
+    toast({ title: "Memory updated!" });
   };
 
   if (!isAuthenticated) {
@@ -562,29 +664,70 @@ const Admin = () => {
                   {photos.map((photo, index) => (
                     <div
                       key={photo.id}
-                      className="flex items-center gap-3 p-3 bg-card border rounded-lg"
+                      className="p-3 bg-card border rounded-lg"
                     >
-                      <GripVertical className="w-4 h-4 text-muted-foreground" />
-                      <img
-                        src={photo.url}
-                        alt={photo.caption || "Photo"}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm truncate">{photo.url}</p>
-                        {photo.caption && (
-                          <p className="text-xs text-muted-foreground truncate">
-                            {photo.caption}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deletePhoto(photo.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
+                      {editingPhoto?.id === photo.id ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={editingPhoto.url}
+                              alt={editingPhoto.caption || "Photo"}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                            <div className="flex-1 space-y-2">
+                              <Input
+                                placeholder="Photo URL"
+                                value={editingPhoto.url}
+                                onChange={(e) => setEditingPhoto({ ...editingPhoto, url: e.target.value })}
+                              />
+                              <Input
+                                placeholder="Caption (optional)"
+                                value={editingPhoto.caption || ""}
+                                onChange={(e) => setEditingPhoto({ ...editingPhoto, caption: e.target.value })}
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingPhoto(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updatePhoto}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <GripVertical className="w-4 h-4 text-muted-foreground" />
+                          <img
+                            src={photo.url}
+                            alt={photo.caption || "Photo"}
+                            className="w-16 h-16 object-cover rounded"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm truncate">{photo.url}</p>
+                            {photo.caption && (
+                              <p className="text-xs text-muted-foreground truncate">
+                                {photo.caption}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingPhoto(photo)}
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deletePhoto(photo.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {photos.length === 0 && (
@@ -622,20 +765,47 @@ const Admin = () => {
                   {reasons.map((reason, index) => (
                     <div
                       key={reason.id}
-                      className="flex items-start gap-3 p-3 bg-card border rounded-lg"
+                      className="p-3 bg-card border rounded-lg"
                     >
-                      <GripVertical className="w-4 h-4 text-muted-foreground mt-1" />
-                      <span className="text-sm text-muted-foreground">
-                        #{index + 1}
-                      </span>
-                      <p className="flex-1 text-sm">{reason.content}</p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteReason(reason.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
+                      {editingReason?.id === reason.id ? (
+                        <div className="space-y-3">
+                          <Textarea
+                            value={editingReason.content}
+                            onChange={(e) => setEditingReason({ ...editingReason, content: e.target.value })}
+                            rows={3}
+                          />
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingReason(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updateReason}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3">
+                          <GripVertical className="w-4 h-4 text-muted-foreground mt-1" />
+                          <span className="text-sm text-muted-foreground">
+                            #{index + 1}
+                          </span>
+                          <p className="flex-1 text-sm">{reason.content}</p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingReason(reason)}
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteReason(reason.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {reasons.length === 0 && (
@@ -710,23 +880,89 @@ const Admin = () => {
                   {specialDates.map((date) => (
                     <div
                       key={date.id}
-                      className="flex items-center gap-3 p-3 bg-card border rounded-lg"
+                      className="p-3 bg-card border rounded-lg"
                     >
-                      <Calendar className="w-5 h-5 text-primary" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium">{date.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(date.event_date).toLocaleDateString()}
-                          {date.is_recurring && " • Yearly"}
-                        </p>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteSpecialDate(date.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
+                      {editingDate?.id === date.id ? (
+                        <div className="space-y-3">
+                          <Input
+                            placeholder="Title"
+                            value={editingDate.title}
+                            onChange={(e) => setEditingDate({ ...editingDate, title: e.target.value })}
+                          />
+                          <Input
+                            type="date"
+                            value={editingDate.event_date}
+                            onChange={(e) => setEditingDate({ ...editingDate, event_date: e.target.value })}
+                          />
+                          <Textarea
+                            placeholder="Description (optional)"
+                            value={editingDate.description || ""}
+                            onChange={(e) => setEditingDate({ ...editingDate, description: e.target.value })}
+                            rows={2}
+                          />
+                          <div className="flex gap-4">
+                            <div className="flex-1">
+                              <select
+                                value={editingDate.icon || "heart"}
+                                onChange={(e) => setEditingDate({ ...editingDate, icon: e.target.value })}
+                                className="w-full px-3 py-2 rounded-md border bg-background"
+                              >
+                                <option value="heart">❤️ Heart</option>
+                                <option value="calendar">📅 Calendar</option>
+                                <option value="gift">🎁 Gift</option>
+                                <option value="cake">🎂 Cake</option>
+                                <option value="sparkles">✨ Sparkles</option>
+                                <option value="party">🎉 Party</option>
+                              </select>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={editingDate.is_recurring || false}
+                                onChange={(e) => setEditingDate({ ...editingDate, is_recurring: e.target.checked })}
+                                className="w-4 h-4"
+                              />
+                              <label className="text-sm">Yearly</label>
+                            </div>
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingDate(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updateSpecialDate}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <Calendar className="w-5 h-5 text-primary" />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium">{date.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(date.event_date).toLocaleDateString()}
+                              {date.is_recurring && " • Yearly"}
+                            </p>
+                            {date.description && (
+                              <p className="text-xs text-muted-foreground truncate">{date.description}</p>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingDate(date)}
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteSpecialDate(date.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {specialDates.length === 0 && (
@@ -796,36 +1032,93 @@ const Admin = () => {
                   {memories.map((memory) => (
                     <div
                       key={memory.id}
-                      className="flex items-start gap-3 p-3 bg-card border rounded-lg"
+                      className="p-3 bg-card border rounded-lg"
                     >
-                      {memory.photo_url && (
-                        <img
-                          src={memory.photo_url}
-                          alt={memory.title}
-                          className="w-16 h-16 object-cover rounded"
-                        />
+                      {editingMemory?.id === memory.id ? (
+                        <div className="space-y-3">
+                          <Input
+                            placeholder="Title"
+                            value={editingMemory.title}
+                            onChange={(e) => setEditingMemory({ ...editingMemory, title: e.target.value })}
+                          />
+                          <Input
+                            type="date"
+                            value={editingMemory.memory_date}
+                            onChange={(e) => setEditingMemory({ ...editingMemory, memory_date: e.target.value })}
+                          />
+                          <Textarea
+                            placeholder="Description (optional)"
+                            value={editingMemory.description || ""}
+                            onChange={(e) => setEditingMemory({ ...editingMemory, description: e.target.value })}
+                            rows={3}
+                          />
+                          <Input
+                            placeholder="Photo URL (optional)"
+                            value={editingMemory.photo_url || ""}
+                            onChange={(e) => setEditingMemory({ ...editingMemory, photo_url: e.target.value })}
+                          />
+                          <select
+                            value={editingMemory.category || "milestone"}
+                            onChange={(e) => setEditingMemory({ ...editingMemory, category: e.target.value })}
+                            className="w-full px-3 py-2 rounded-md border bg-background"
+                          >
+                            <option value="milestone">⭐ Milestone</option>
+                            <option value="date">❤️ Date</option>
+                            <option value="travel">✈️ Travel</option>
+                            <option value="photo">📷 Photo Moment</option>
+                            <option value="music">🎵 Music</option>
+                            <option value="gift">🎁 Gift</option>
+                            <option value="special">✨ Special</option>
+                            <option value="location">📍 Location</option>
+                          </select>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingMemory(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updateMemory}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3">
+                          {memory.photo_url && (
+                            <img
+                              src={memory.photo_url}
+                              alt={memory.title}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          )}
+                          {!memory.photo_url && (
+                            <Clock className="w-5 h-5 text-primary mt-1" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium">{memory.title}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(memory.memory_date).toLocaleDateString()} • {memory.category}
+                            </p>
+                            {memory.description && (
+                              <p className="text-sm text-muted-foreground truncate mt-1">
+                                {memory.description}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingMemory(memory)}
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteMemory(memory.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
                       )}
-                      {!memory.photo_url && (
-                        <Clock className="w-5 h-5 text-primary mt-1" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium">{memory.title}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(memory.memory_date).toLocaleDateString()} • {memory.category}
-                        </p>
-                        {memory.description && (
-                          <p className="text-sm text-muted-foreground truncate mt-1">
-                            {memory.description}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteMemory(memory.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
                     </div>
                   ))}
                   {memories.length === 0 && (
@@ -951,22 +1244,60 @@ const Admin = () => {
                   {bucketItems.map((item, index) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 p-3 bg-card border rounded-lg"
+                      className="p-3 bg-card border rounded-lg"
                     >
-                      <GripVertical className="w-4 h-4 text-muted-foreground" />
-                      <span className={`flex-1 ${item.is_completed ? "line-through text-muted-foreground" : ""}`}>
-                        {item.content}
-                      </span>
-                      {item.is_completed && (
-                        <span className="text-xs text-green-600 font-medium">Done!</span>
+                      {editingBucket?.id === item.id ? (
+                        <div className="space-y-3">
+                          <Input
+                            value={editingBucket.content}
+                            onChange={(e) => setEditingBucket({ ...editingBucket, content: e.target.value })}
+                          />
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={editingBucket.is_completed}
+                              onChange={(e) => setEditingBucket({ ...editingBucket, is_completed: e.target.checked })}
+                              className="w-4 h-4"
+                            />
+                            <label className="text-sm">Completed</label>
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingBucket(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updateBucketItem}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <GripVertical className="w-4 h-4 text-muted-foreground" />
+                          <input
+                            type="checkbox"
+                            checked={item.is_completed}
+                            onChange={() => toggleBucketComplete(item)}
+                            className="w-4 h-4"
+                          />
+                          <span className={`flex-1 ${item.is_completed ? "line-through text-muted-foreground" : ""}`}>
+                            {item.content}
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingBucket(item)}
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteBucketItem(item.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteBucketItem(item.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
                     </div>
                   ))}
                   {bucketItems.length === 0 && (
@@ -1025,22 +1356,80 @@ const Admin = () => {
                   {quizQuestions.map((q, index) => (
                     <div
                       key={q.id}
-                      className="p-4 bg-card border rounded-lg space-y-2"
+                      className="p-4 bg-card border rounded-lg"
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="font-medium">Q{index + 1}: {q.question}</p>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => deleteQuizQuestion(q.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                      <p className="text-sm text-green-600">✓ {q.correct_answer}</p>
-                      <p className="text-sm text-muted-foreground">
-                        ✗ {q.wrong_answers.join(" | ")}
-                      </p>
+                      {editingQuiz?.id === q.id ? (
+                        <div className="space-y-3">
+                          <Input
+                            placeholder="Question"
+                            value={editingQuiz.question}
+                            onChange={(e) => setEditingQuiz({ ...editingQuiz, question: e.target.value })}
+                          />
+                          <Input
+                            placeholder="Correct answer"
+                            value={editingQuiz.correct_answer}
+                            onChange={(e) => setEditingQuiz({ ...editingQuiz, correct_answer: e.target.value })}
+                            className="border-green-300"
+                          />
+                          <div className="space-y-2">
+                            <p className="text-sm text-muted-foreground">Wrong answers:</p>
+                            {editingQuiz.wrong_answers.map((answer, idx) => (
+                              <Input
+                                key={idx}
+                                placeholder={`Wrong answer ${idx + 1}`}
+                                value={answer}
+                                onChange={(e) => {
+                                  const updated = [...editingQuiz.wrong_answers];
+                                  updated[idx] = e.target.value;
+                                  setEditingQuiz({ ...editingQuiz, wrong_answers: updated });
+                                }}
+                                className="border-red-200"
+                              />
+                            ))}
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingQuiz({ ...editingQuiz, wrong_answers: [...editingQuiz.wrong_answers, ""] })}
+                            >
+                              <Plus className="w-3 h-3 mr-1" /> Add wrong answer
+                            </Button>
+                          </div>
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingQuiz(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updateQuizQuestion}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-medium">Q{index + 1}: {q.question}</p>
+                            <div className="flex">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setEditingQuiz(q)}
+                              >
+                                <Pencil className="w-4 h-4 text-muted-foreground" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => deleteQuizQuestion(q.id)}
+                              >
+                                <Trash2 className="w-4 h-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
+                          <p className="text-sm text-green-600">✓ {q.correct_answer}</p>
+                          <p className="text-sm text-muted-foreground">
+                            ✗ {q.wrong_answers.join(" | ")}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {quizQuestions.length === 0 && (
@@ -1068,17 +1457,44 @@ const Admin = () => {
                   {wishes.map((wish) => (
                     <div
                       key={wish.id}
-                      className="flex items-center gap-3 p-3 bg-card border rounded-lg"
+                      className="p-3 bg-card border rounded-lg"
                     >
-                      <Star className="w-5 h-5 text-gold fill-gold" />
-                      <p className="flex-1">{wish.wish}</p>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteWish(wish.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
+                      {editingWish?.id === wish.id ? (
+                        <div className="space-y-3">
+                          <Textarea
+                            value={editingWish.wish}
+                            onChange={(e) => setEditingWish({ ...editingWish, wish: e.target.value })}
+                            rows={2}
+                          />
+                          <div className="flex justify-end gap-2">
+                            <Button variant="ghost" size="sm" onClick={() => setEditingWish(null)}>
+                              <X className="w-4 h-4 mr-1" /> Cancel
+                            </Button>
+                            <Button size="sm" onClick={updateWish}>
+                              <Check className="w-4 h-4 mr-1" /> Save
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <Star className="w-5 h-5 text-gold fill-gold" />
+                          <p className="flex-1">{wish.wish}</p>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setEditingWish(wish)}
+                          >
+                            <Pencil className="w-4 h-4 text-muted-foreground" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteWish(wish.id)}
+                          >
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   ))}
                   {wishes.length === 0 && (
