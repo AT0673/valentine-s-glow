@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Settings } from "lucide-react";
 import { FloatingHearts } from "@/components/FloatingHearts";
+import { FloatingNav } from "@/components/FloatingNav";
 import { SpinningHeart } from "@/components/SpinningHeart";
 import { RelationshipStats } from "@/components/RelationshipStats";
 import { PhotoGallery } from "@/components/PhotoGallery";
@@ -51,12 +52,14 @@ const Valentine = () => {
       <ReasonsSection />
 
       {/* Footer */}
-      <footer className="py-12 text-center bg-gradient-to-t from-secondary/50 to-transparent">
+      <footer className="py-12 pb-24 text-center bg-gradient-to-t from-secondary/50 to-transparent">
         <p className="font-romantic text-2xl text-primary mb-2">
           Forever & Always
         </p>
         <p className="text-muted-foreground">With all my love ❤️</p>
       </footer>
+
+      <FloatingNav />
     </div>;
 };
 export default Valentine;
