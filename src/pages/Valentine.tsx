@@ -29,7 +29,7 @@ const Valentine = () => {
       <section className="min-h-screen flex flex-col items-center justify-center px-4 relative">
         <div className={`text-center transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-romantic mb-6 leading-tight">To Judy</h1>
-          <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-8">I put a lot of effort into this in case you couldn't tell, this is my showing of love. ❤️</p>
+          <p className="text-xl md:text-2xl text-muted-foreground font-light max-w-2xl mx-auto mb-8">I put a lot of effort into this in case you couldn't tell.... This is my showing of love. ❤️</p>
         </div>
 
         <SpinningHeart />
