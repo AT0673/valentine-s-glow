@@ -1,9 +1,11 @@
 import { Link, useLocation } from "react-router-dom";
-import { Heart, Mail, Star, Sparkles, HelpCircle } from "lucide-react";
+import { Heart, Mail, Star, Sparkles, HelpCircle, Calendar, Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/valentine", icon: Heart, label: "Home" },
+  { path: "/countdown", icon: Calendar, label: "Countdown" },
+  { path: "/timeline", icon: Clock, label: "Timeline" },
   { path: "/love-letter", icon: Mail, label: "Letter" },
   { path: "/dreams", icon: Sparkles, label: "Dreams" },
   { path: "/quiz", icon: HelpCircle, label: "Quiz" },

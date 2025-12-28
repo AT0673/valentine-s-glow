@@ -65,6 +65,42 @@ export type Database = {
         }
         Relationships: []
       }
+      memories: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          id: string
+          memory_date: string
+          photo_url: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          memory_date: string
+          photo_url?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          id?: string
+          memory_date?: string
+          photo_url?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       photos: {
         Row: {
           caption: string | null
@@ -164,6 +200,42 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string | null
+        }
+        Relationships: []
+      }
+      special_dates: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_order: number | null
+          event_date: string
+          icon: string | null
+          id: string
+          is_recurring: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          event_date: string
+          icon?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          event_date?: string
+          icon?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
