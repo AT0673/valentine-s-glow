@@ -32,6 +32,26 @@ interface Reason {
   display_order: number;
 }
 
+// Helper function to convert Spotify URL to embed URL
+const getSpotifyEmbedUrl = (url: string): string => {
+  // Handle various Spotify URL formats
+  const patterns = [
+    /spotify\.com\/track\/([a-zA-Z0-9]+)/,
+    /spotify\.com\/album\/([a-zA-Z0-9]+)/,
+    /spotify\.com\/playlist\/([a-zA-Z0-9]+)/,
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) {
+      const type = url.includes('/track/') ? 'track' : url.includes('/album/') ? 'album' : 'playlist';
+      return `https://open.spotify.com/embed/${type}/${match[1]}?utm_source=generator&theme=0`;
+    }
+  }
+  
+  return url;
+};
+
 const Admin = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -349,20 +369,56 @@ const Admin = () => {
               <CardHeader>
                 <CardTitle>Manage Music</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Add a direct link to an MP3 file or audio URL. The music will
-                  play in the background when visitors open the site.
-                </p>
-                <Input
-                  placeholder="https://example.com/song.mp3"
-                  value={musicUrl}
-                  onChange={(e) => setMusicUrl(e.target.value)}
-                />
-                <Button onClick={saveMusicUrl} className="w-full">
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Music URL
-                </Button>
+              <CardContent className="space-y-6">
+                <div className="space-y-3 p-4 bg-secondary/50 rounded-lg">
+                  <h3 className="font-medium">Add Spotify Track or Playlist</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Paste a Spotify URL (track, album, or playlist) to embed it on the site.
+                  </p>
+                  <Input
+                    placeholder="https://open.spotify.com/track/..."
+                    value={musicUrl}
+                    onChange={(e) => setMusicUrl(e.target.value)}
+                  />
+                  <Button onClick={saveMusicUrl} className="w-full">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Music
+                  </Button>
+                </div>
+
+                {/* Spotify Preview */}
+                {musicUrl && musicUrl.includes("spotify.com") && (
+                  <div className="space-y-3">
+                    <h3 className="font-medium">Preview</h3>
+                    <div className="rounded-xl overflow-hidden shadow-lg">
+                      <iframe
+                        src={getSpotifyEmbedUrl(musicUrl)}
+                        width="100%"
+                        height="352"
+                        frameBorder="0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy"
+                        className="rounded-xl"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* MP3 URL option */}
+                {musicUrl && !musicUrl.includes("spotify.com") && musicUrl.trim() && (
+                  <div className="p-4 bg-card border rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      Direct audio URL saved. The music will play in the background.
+                    </p>
+                  </div>
+                )}
+
+                {!musicUrl && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Music className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>No music configured yet</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
