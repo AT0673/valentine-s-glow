@@ -256,6 +256,12 @@ const Countdown = () => {
                               <span className="font-mono font-medium">{countdown.days}</span> days,{" "}
                               <span className="font-mono">{countdown.hours}h {countdown.minutes}m</span>
                             </p>
+                          ) : !date.is_recurring && countdown?.isPast ? (
+                            <p className="text-sm mt-2 text-muted-foreground">
+                              <span className="font-mono font-medium">
+                                {Math.floor((new Date().getTime() - new Date(date.event_date).getTime()) / (1000 * 60 * 60 * 24))}
+                              </span> days ago 💕
+                            </p>
                           ) : null}
                         </div>
                       </div>
