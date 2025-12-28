@@ -2,7 +2,7 @@ import { Heart } from "lucide-react";
 
 export const SpinningHeart = () => {
   return (
-    <div className="relative flex items-center justify-center py-12">
+    <div className="relative flex items-center justify-center py-12 mt-8 mx-auto">
       {/* Outer glow */}
       <div className="absolute w-40 h-40 rounded-full bg-primary/20 blur-3xl animate-pulse" />
       
