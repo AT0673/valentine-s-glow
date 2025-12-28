@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      bucket_list_items: {
+        Row: {
+          content: string
+          created_at: string
+          display_order: number | null
+          id: string
+          is_completed: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      love_letters: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       photos: {
         Row: {
           caption: string | null
@@ -38,6 +89,33 @@ export type Database = {
           id?: string
           updated_at?: string
           url?: string
+        }
+        Relationships: []
+      }
+      quiz_questions: {
+        Row: {
+          correct_answer: string
+          created_at: string
+          display_order: number | null
+          id: string
+          question: string
+          wrong_answers: string[]
+        }
+        Insert: {
+          correct_answer: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          question: string
+          wrong_answers?: string[]
+        }
+        Update: {
+          correct_answer?: string
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          question?: string
+          wrong_answers?: string[]
         }
         Relationships: []
       }
@@ -86,6 +164,30 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string | null
+        }
+        Relationships: []
+      }
+      star_wishes: {
+        Row: {
+          created_at: string
+          id: string
+          wish: string
+          x_position: number | null
+          y_position: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          wish: string
+          x_position?: number | null
+          y_position?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          wish?: string
+          x_position?: number | null
+          y_position?: number | null
         }
         Relationships: []
       }
