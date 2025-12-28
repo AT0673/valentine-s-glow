@@ -24,11 +24,8 @@ const Quiz = () => {
 
   useEffect(() => {
     const fetchQuestions = async () => {
-      const { data } = await supabase
-        .from("quiz_questions")
-        .select("*")
-        .order("display_order", { ascending: true });
-      
+      const { data } = await supabase.from("quiz_questions").select("*").order("display_order", { ascending: true });
+
       if (data && data.length > 0) {
         setQuestions(data);
       }
@@ -37,7 +34,7 @@ const Quiz = () => {
   }, []);
 
   const currentQuestion = questions[currentIndex];
-  
+
   // Shuffle answers for current question
   const shuffledAnswers = useMemo(() => {
     if (!currentQuestion) return [];
@@ -47,10 +44,10 @@ const Quiz = () => {
 
   const handleAnswer = (answer: string) => {
     if (isAnswered) return;
-    
+
     setSelectedAnswer(answer);
     setIsAnswered(true);
-    
+
     if (answer === currentQuestion.correct_answer) {
       setScore(score + 1);
       setShowConfetti(true);
@@ -78,10 +75,10 @@ const Quiz = () => {
 
   const getScoreMessage = () => {
     const percentage = (score / questions.length) * 100;
-    if (percentage === 100) return "Perfect! You know me so well! 💕";
-    if (percentage >= 80) return "Amazing! You really pay attention! 💖";
-    if (percentage >= 60) return "Pretty good! We're learning together! 💗";
-    return "Let's make more memories together! 💓";
+    if (percentage === 100) return "Oh wow, just say you have a crush on me 💕";
+    if (percentage >= 80) return "Judy baby, I'm surprised you can focus this well 💖";
+    if (percentage >= 60) return "You're learning darling.... 💗";
+    return "Do you even listen to me? *sob* *yearns* 💓";
   };
 
   if (questions.length === 0) {
@@ -101,7 +98,7 @@ const Quiz = () => {
   return (
     <div className="min-h-screen bg-gradient-soft relative overflow-hidden">
       <FloatingHearts />
-      
+
       {/* Confetti effect */}
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50">
@@ -123,21 +120,23 @@ const Quiz = () => {
           ))}
         </div>
       )}
-      
+
       <div className="container max-w-2xl mx-auto px-4 py-20">
         {!isComplete ? (
           <>
             {/* Progress */}
             <div className="mb-8">
               <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                <span>Question {currentIndex + 1} of {questions.length}</span>
+                <span>
+                  Question {currentIndex + 1} of {questions.length}
+                </span>
                 <span className="flex items-center gap-1">
                   <Heart className="w-4 h-4 text-rose fill-current" />
                   {score}
                 </span>
               </div>
               <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gradient-heart rounded-full transition-all duration-500"
                   style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
                 />
@@ -146,15 +145,13 @@ const Quiz = () => {
 
             {/* Question card */}
             <div className="bg-card/90 backdrop-blur-sm rounded-3xl p-8 shadow-romantic border border-border/50 animate-fade-in">
-              <h2 className="text-2xl md:text-3xl font-romantic text-center mb-8">
-                {currentQuestion?.question}
-              </h2>
-              
+              <h2 className="text-2xl md:text-3xl font-romantic text-center mb-8">{currentQuestion?.question}</h2>
+
               <div className="space-y-3">
                 {shuffledAnswers.map((answer, index) => {
                   const isCorrect = answer === currentQuestion?.correct_answer;
                   const isSelected = answer === selectedAnswer;
-                  
+
                   return (
                     <button
                       key={index}
@@ -163,7 +160,7 @@ const Quiz = () => {
                         !isAnswered && "hover:border-rose hover:bg-rose-light/20 border-border/50 bg-background/50",
                         isAnswered && isCorrect && "border-green-500 bg-green-500/20",
                         isAnswered && isSelected && !isCorrect && "border-red-400 bg-red-400/20",
-                        isAnswered && !isSelected && !isCorrect && "opacity-50 border-border/30"
+                        isAnswered && !isSelected && !isCorrect && "opacity-50 border-border/30",
                       )}
                       onClick={() => handleAnswer(answer)}
                       disabled={isAnswered}
@@ -173,15 +170,15 @@ const Quiz = () => {
                   );
                 })}
               </div>
-              
+
               {isAnswered && (
                 <div className="mt-6 text-center animate-fade-in">
-                  <p className={cn(
-                    "text-lg font-medium mb-4",
-                    selectedAnswer === currentQuestion?.correct_answer
-                      ? "text-green-600"
-                      : "text-red-500"
-                  )}>
+                  <p
+                    className={cn(
+                      "text-lg font-medium mb-4",
+                      selectedAnswer === currentQuestion?.correct_answer ? "text-green-600" : "text-red-500",
+                    )}
+                  >
                     {selectedAnswer === currentQuestion?.correct_answer
                       ? "Correct! 💕"
                       : `The answer was: ${currentQuestion?.correct_answer}`}
@@ -198,32 +195,28 @@ const Quiz = () => {
           <div className="text-center animate-fade-in">
             <div className="bg-card/90 backdrop-blur-sm rounded-3xl p-12 shadow-romantic border border-border/50">
               <Trophy className="w-20 h-20 mx-auto text-gold mb-6" />
-              
+
               <h2 className="text-4xl font-romantic mb-4">Quiz Complete!</h2>
-              
+
               <div className="flex justify-center items-center gap-2 mb-6">
                 {[...Array(questions.length)].map((_, i) => (
                   <Heart
                     key={i}
                     className={cn(
                       "w-8 h-8 transition-all duration-300",
-                      i < score
-                        ? "text-rose fill-current animate-heart-beat"
-                        : "text-muted-foreground/30"
+                      i < score ? "text-rose fill-current animate-heart-beat" : "text-muted-foreground/30",
                     )}
                     style={{ animationDelay: `${i * 0.1}s` }}
                   />
                 ))}
               </div>
-              
+
               <p className="text-3xl font-romantic text-primary mb-4">
                 {score} / {questions.length}
               </p>
-              
-              <p className="text-xl text-muted-foreground mb-8">
-                {getScoreMessage()}
-              </p>
-              
+
+              <p className="text-xl text-muted-foreground mb-8">{getScoreMessage()}</p>
+
               <Button onClick={restartQuiz} variant="outline" className="gap-2">
                 <RefreshCw className="w-4 h-4" />
                 Play Again
@@ -232,7 +225,7 @@ const Quiz = () => {
           </div>
         )}
       </div>
-      
+
       <FloatingNav />
     </div>
   );
